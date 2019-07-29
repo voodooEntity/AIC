@@ -129,7 +129,7 @@ class AnalyzeImageColors {
 $imagePath = "824304416009-06.png";
 $arrColors = [
     "beige" => "d1bc8a",
-    "blau" => "333fff",
+    "blau" => "0000ff",
     "braun" => "783000",
     "coral" => "f88379",
     "gelb" => "ffff00",
