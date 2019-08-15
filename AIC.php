@@ -116,14 +116,9 @@ class AnalyzeImageColors {
     }
     
     private function calcHueDistance($alpha, $beta) {
-        $arr    = [$alpha,$beta];
-        asort($arr);
-        $arr    = array_values($arr);
-        $factor = $arr[1] - $arr[0];
-        if($arr[0] < 30 && $arr[1] > 330) {
-            $factor = 360 - $arr[1] + $arr[0];
-        }
-        return  $this->intHueWeight / 180 * $factor;
+        $oneWay   = abs(($alpha + 360 - $beta) % 360);
+        $otherWay = abs(($alpha -360 - $beta) % 360);
+        return  $this->intHueWeight / 180 * min($oneWay, $otherWay);
     }
     
     private function calcSaturationDistance($alpha, $beta) {
