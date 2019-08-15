@@ -11,16 +11,16 @@ class AnalyzeImageColors {
     private $imageRes;
     private $imageWith;
     private $imageHeight;
-    private $intSaturationWeight = 5;
-    private $intValueWeight      = 3;
-    private $intHueWeight        = 2;
+    private $intSaturationWeight = 30;
+    private $intValueWeight      = 20;
+    private $intHueWeight        = 80;
     private $arrColors   = [];
     private $colorCounts = [];
     
     public function __construct($maxDistance = 100) {
         $this->intMaxDistance = $maxDistance;
     }
-     
+    
     public function setColors($arrColors) {
         $this->arrColors = $arrColors;
         foreach($arrColors as $key => $drop) {
@@ -64,7 +64,7 @@ class AnalyzeImageColors {
         $maxDistance   = $this->intMaxDistance;
         $closestColor  = false;
         // calculate the hex for the pixel we have to test
-        $testRgba      = $this->getPixelColor($x,$y);
+        $testRgba         = $this->getPixelColor($x,$y);
         // filter full alpha
         if($testRgba === AnalyzeImageColors::SKIP_ALPHA) {
             return AnalyzeImageColors::ERR_NO_HITS;
@@ -78,6 +78,9 @@ class AnalyzeImageColors {
                 $this->hexToRgb($colorData["hex"]),
                 $testRgba
             );
+            if($colorName == "braun") {
+                //echo "|" . $currDist;
+            }
             // if we got a specific precision gonne evaluate it
             if(isset($colorData["precision"])) {
                 $precision = $colorData["precision"];
@@ -204,92 +207,3 @@ class AnalyzeImageColors {
     }
     
 }
-$imagePath = "test.png";
-$arrColors = [
-    "beige" => [
-        "hex"       => "d1bc8a",
-        "precision" => 15
-    ],
-    "blau" => [
-        "hex"       => "0000ff",
-        "precision" => 15
-    ],
-    "braun" => [
-        "hex"       => "783000",
-        "precision" => 17
-    ],
-    "coral" => [
-        "hex"       => "f88379",
-        "precision" => 15
-    ],
-    "gelb" => [
-        "hex"       => "ffff00",
-        "precision" => 10
-    ],
-    "gold" => [
-        "hex"       => "d4af37",
-        "precision" => 15
-    ],
-    "grau" => [
-        "hex"       => "808080",
-        "precision" => 15
-    ],
-    "grün" => [
-        "hex"       => "33ff33",
-        "precision" => 15
-    ],
-    "lachs" => [
-        "hex"       => "f07030",
-        "precision" => 15
-    ],
-    "lila"    => [
-        "hex"       => "800080",
-        "precision" => 15
-    ],
-    "oliv"    => [
-        "hex"       => "bab86c",
-        "precision" => 15
-    ],
-    "orange"  => [
-        "hex"       => "ffa500",
-        "precision" => 15
-    ],
-    "pink"    => [
-        "hex"       => "ffc0cb",
-        "precision" => 15
-    ],
-    "rosa"    => [
-        "hex"       => "ea899a",
-        "precision" => 15
-    ],
-    "rot"     => [
-        "hex"       => "ff0000",
-        "precision" => 15
-    ],
-    "schwarz" => [
-        "hex"       => "000000",
-        "precision" => 15
-    ],
-    "silber"  => [
-        "hex"       => "c0c0c0",
-        "precision" => 15
-    ],
-    "türkis"  => [
-        "hex"       => "48d1cc",
-        "precision" => 15
-    ],
-    "weiß"    => [
-        "hex"       => "ffffff",
-        "precision" => 15
-    ],
-];
-
-
-// test
-$objAIC  = new AnalyzeImageColors(15);
-$objAIC->setColors($arrColors);
-
-
-$ret = $objAIC->process($imagePath);
-var_dump($ret);
-?>

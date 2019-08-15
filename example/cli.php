@@ -85,4 +85,5 @@ $arrColors = [
 ];
 $objAIC  = new AnalyzeImageColors(100);
 $objAIC->setColors($arrColors);
-return $objAIC->process($imagePath);
+$ret = $objAIC->process($imagePath);
+var_dump($ret);
