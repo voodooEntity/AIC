@@ -20,7 +20,7 @@ class AnalyzeImageColors {
     public function __construct($maxDistance = 100) {
         $this->intMaxDistance = $maxDistance;
     }
-    
+     
     public function setColors($arrColors) {
         $this->arrColors = $arrColors;
         foreach($arrColors as $key => $drop) {
