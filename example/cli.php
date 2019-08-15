@@ -2,7 +2,7 @@
 if(!$argv[1]) {
     die("no path given");
 }
-$path = $argv;
+$imagePath = $argv[1];
 
 include'../AIC.php';
 $arrColors = [

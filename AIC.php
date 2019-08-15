@@ -64,7 +64,7 @@ class AnalyzeImageColors {
         $maxDistance   = $this->intMaxDistance;
         $closestColor  = false;
         // calculate the hex for the pixel we have to test
-        $testRgba         = $this->getPixelColor($x,$y);
+        $testRgba      = $this->getPixelColor($x,$y);
         // filter full alpha
         if($testRgba === AnalyzeImageColors::SKIP_ALPHA) {
             return AnalyzeImageColors::ERR_NO_HITS;
@@ -78,9 +78,6 @@ class AnalyzeImageColors {
                 $this->hexToRgb($colorData["hex"]),
                 $testRgba
             );
-            if($colorName == "braun") {
-                //echo "|" . $currDist;
-            }
             // if we got a specific precision gonne evaluate it
             if(isset($colorData["precision"])) {
                 $precision = $colorData["precision"];
