@@ -11,9 +11,9 @@ class AnalyzeImageColors {
     private $imageRes;
     private $imageWith;
     private $imageHeight;
-    private $intSaturationWeight = 4;
+    private $intSaturationWeight = 5;
     private $intValueWeight      = 3;
-    private $intHueWeight        = 10;
+    private $intHueWeight        = 2;
     private $arrColors   = [];
     private $colorCounts = [];
     
@@ -60,7 +60,9 @@ class AnalyzeImageColors {
     }
     
     private function findClosestColorInListByHsvDistance($x,$y) {
-        $closestColor     = false;
+        // reset min distance to allowed max or
+        $maxDistance   = $this->intMaxDistance;
+        $closestColor  = false;
         // calculate the hex for the pixel we have to test
         $testRgba         = $this->getPixelColor($x,$y);
         // filter full alpha
@@ -69,12 +71,8 @@ class AnalyzeImageColors {
         }
         // test all registered colors for closest distance
         foreach($this->arrColors as $colorName => $colorData) {
-            // reset min distance to allowed max or
-            // if we got a specific precision we use it
-            $smallestDistance = $this->intMaxDistance;
-            if(isset($colorData["precision"])) {
-                $smallestDistance = $colorData["precision"];
-            }
+            // reset precision 
+            $precision = $this->intMaxDistance;
             // get the color diffrence bei hsv
             $currDist = $this->colorDiffByHsvDistance(
                 $this->hexToRgb($colorData["hex"]),
@@ -83,11 +81,15 @@ class AnalyzeImageColors {
             if($colorName == "braun") {
                 //echo "|" . $currDist;
             }
+            // if we got a specific precision gonne evaluate it
+            if(isset($colorData["precision"])) {
+                $precision = $colorData["precision"];
+            }
             // check if the color is closer than all before
-            if($currDist < $smallestDistance) {
+            if($currDist < $maxDistance && $currDist < $precision) {
                 // seems to be, safe it for return
-                $smallestDistance = $currDist;
-                $closestColor     = $colorName;
+                $maxDistance  = $currDist;
+                $closestColor = $colorName;
             }
         }
         if(false === $closestColor) {
@@ -95,7 +97,7 @@ class AnalyzeImageColors {
         }
         return [
             "name"     => $closestColor,
-            "distance" => $smallestDistance
+            "distance" => $maxDistance
         ];
     }
     
@@ -114,26 +116,28 @@ class AnalyzeImageColors {
     }
     
     private function calcHueDistance($alpha, $beta) {
-        $arr  = [$alpha,$beta];
+        $arr    = [$alpha,$beta];
         asort($arr);
+        $arr    = array_values($arr);
         $factor = $arr[1] - $arr[0];
-        if($arr[0] < 10 && $arr[1] > 90) {
-            $factor = 100 - $arr[1] + $arr[0];
-            //echo $factor . "|";
+        if($arr[0] < 30 && $arr[1] > 330) {
+            $factor = 360 - $arr[1] + $arr[0];
         }
-        return  $this->intHueWeight / 30 * $factor;
+        return  $this->intHueWeight / 180 * $factor;
     }
     
     private function calcSaturationDistance($alpha, $beta) {
         $arr  = [$alpha,$beta];
         asort($arr);
+        $arr = array_values($arr);
         return $this->intSaturationWeight / 100 * ($arr[1] - $arr[0]) ;
     }
     
     private function calcValueDistance($alpha, $beta) {
         $arr  = [$alpha,$beta];
         asort($arr);
-        return $this->intValueWeight / 100 * ($arr[1] - $arr[0]) ;
+        $arr = array_values($arr);
+        return $this->intValueWeight / 360 * ($arr[1] - $arr[0]) ;
     }
     
     private function getPixelColor($x, $y) {
@@ -204,8 +208,7 @@ class AnalyzeImageColors {
                 $h -= 1;
             }
         }
-        return ["h" => round($h * 100), "s" => round($s * 100), "v" => round($v * 100) ];
-        //return ["h" => round($h * 360), "s" => round($s * 100), "v" => round($v * 100) ];
+        return ["h" => round($h * 360), "s" => round($s * 100), "v" => round($v * 100) ];
     }
     
 }
@@ -213,7 +216,7 @@ $imagePath = "test.png";
 $arrColors = [
     "beige" => [
         "hex"       => "d1bc8a",
-        "precision" => 10
+        "precision" => 15
     ],
     "blau" => [
         "hex"       => "0000ff",
@@ -225,7 +228,7 @@ $arrColors = [
     ],
     "coral" => [
         "hex"       => "f88379",
-        "precision" => 10
+        "precision" => 15
     ],
     "gelb" => [
         "hex"       => "ffff00",
@@ -233,11 +236,11 @@ $arrColors = [
     ],
     "gold" => [
         "hex"       => "d4af37",
-        "precision" => 8
+        "precision" => 15
     ],
     "grau" => [
         "hex"       => "808080",
-        "precision" => 10
+        "precision" => 15
     ],
     "grün" => [
         "hex"       => "33ff33",
@@ -245,27 +248,27 @@ $arrColors = [
     ],
     "lachs" => [
         "hex"       => "f07030",
-        "precision" => 8
+        "precision" => 15
     ],
     "lila"    => [
         "hex"       => "800080",
-        "precision" => 8
+        "precision" => 15
     ],
     "oliv"    => [
         "hex"       => "bab86c",
-        "precision" => 8
+        "precision" => 15
     ],
     "orange"  => [
         "hex"       => "ffa500",
-        "precision" => 10
+        "precision" => 15
     ],
     "pink"    => [
         "hex"       => "ffc0cb",
-        "precision" => 9
+        "precision" => 15
     ],
     "rosa"    => [
         "hex"       => "ea899a",
-        "precision" => 9
+        "precision" => 15
     ],
     "rot"     => [
         "hex"       => "ff0000",
@@ -273,19 +276,19 @@ $arrColors = [
     ],
     "schwarz" => [
         "hex"       => "000000",
-        "precision" => 7
+        "precision" => 15
     ],
     "silber"  => [
         "hex"       => "c0c0c0",
-        "precision" => 9
+        "precision" => 15
     ],
     "türkis"  => [
         "hex"       => "48d1cc",
-        "precision" => 7
+        "precision" => 15
     ],
     "weiß"    => [
         "hex"       => "ffffff",
-        "precision" => 7
+        "precision" => 15
     ],
 ];
 
